@@ -10,6 +10,7 @@
          (func (intern (pop args)))
 	 (precise (string-to-number (pop args)))
          (arg))
+    (setq calc-internal-prec precise)
     (while-let ((x (pop args)))
       (push (math-read-number-simple x) arg))
     (unless (fboundp func)
