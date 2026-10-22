@@ -4,15 +4,22 @@
 (require 'calc)
 (require 'calc-funcs)
 (require 'calc-cplx)
-
+(require 'calc-ext)
 (defun calc-funcs-get-result ()
   (let* ((args (cdr (member "--" command-line-args-left)))
-         (func (intern (nth 0 args)))
-         (arg (math-read-number-simple (nth 1 args))))
-    (unless (and (math-numberp arg) (fboundp func))
-      (error "Invalid function or missing argument"))
-    (princ (format "[RESULT] %s(%s): %S\n"
+         (func (intern (pop args)))
+	 (precise (string-to-number (pop args)))
+         (arg))
+    (while-let ((x (pop args)))
+      (push (math-read-number-simple x) arg))
+    (unless (fboundp func)
+      (error "Invalid function"))
+    (while-let ((x (pop arg))
+		(res (funcall func x))
+		(x (math-format-number x))
+		(res (math-format-number res)))
+      (princ (format "[RESULT] %s(%s): %S\n"
                    func
-                   arg
-                   (funcall func arg)))))
+                   x
+                   res)))))
 (calc-funcs-get-result)
